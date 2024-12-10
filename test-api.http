@@ -10,9 +10,6 @@ Content-Type: application/json
 {}
 
 
-client.test("Request executed successfully, function()"
-
-
 ###
 PATCH http://localhost:1234/users/1
 Content-Type: application/json

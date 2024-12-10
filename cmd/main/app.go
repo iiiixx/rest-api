@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"time"
+
+	"rest-api/pkg/logging"
 
 	"rest-api/internal/user"
 
@@ -20,11 +21,13 @@ func IndexHandler(w http.ResponseWriter, r *http.Request, params httprouter.Para
 }
 
 func main() {
-	log.Println("create router")
+	logger := logging.GetLogger()
+	logger.Info("create router")
+
 	router := httprouter.New()
 
-	log.Println("register user handler")
-	handler := user.NewHandler()
+	logger.Info("register user handler")
+	handler := user.NewHandler(logger)
 	handler.Register(router)
 
 	start(router)
@@ -33,7 +36,8 @@ func main() {
 
 // Настройка и запуск сервера
 func start(router *httprouter.Router) {
-	log.Println("start application")
+	logger := logging.GetLogger()
+	logger.Info("start application")
 
 	listener, err := net.Listen("tcp", ":1234")
 	if err != nil {
@@ -47,6 +51,6 @@ func start(router *httprouter.Router) {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Println("server is listening port 0.0.0.0:1234")
-	log.Fatalln(server.Serve(listener))
+	logger.Info("server is listening port 0.0.0.0:1234")
+	logger.Fatalln(server.Serve(listener))
 }
