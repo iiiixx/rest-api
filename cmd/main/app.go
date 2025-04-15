@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -9,10 +10,12 @@ import (
 	"path/filepath"
 	"time"
 
+	"rest-api/pkg/client/mongodb"
 	"rest-api/pkg/logging"
 
 	"rest-api/internal/config"
 	"rest-api/internal/user"
+	"rest-api/internal/user/db"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -27,10 +30,20 @@ func IndexHandler(w http.ResponseWriter, r *http.Request, params httprouter.Para
 func main() {
 	logger := logging.GetLogger()
 	logger.Info("create router")
-
 	router := httprouter.New()
 
 	cfg := config.GetConfig()
+
+	cfgMongo := cfg.MongoDB
+	mongoDBClient, err := mongodb.NewClient(context.Background(), cfgMongo.Host, cfgMongo.Port, cfgMongo.Username,
+		cfgMongo.Password, cfgMongo.Database, cfgMongo.AuthDB)
+	if err != nil {
+		panic(err)
+	}
+	storage := db.NewStorage(mongoDBClient, cfg.MongoDB.Collection, logger)
+
+	users, err := storage.FindAll(context.Background())
+	fmt.Println(users)
 
 	logger.Info("register user handler")
 	handler := user.NewHandler(logger)
@@ -49,7 +62,7 @@ func start(router *httprouter.Router, cfg *config.Config) {
 	var listenError error
 
 	if cfg.Listen.Type == "sock" {
-		logger.Info("detecy app path")
+		logger.Info("detect app path")
 		appDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		if err != nil {
 			logger.Fatal(filepath.ErrBadPattern)
@@ -66,7 +79,6 @@ func start(router *httprouter.Router, cfg *config.Config) {
 		logger.Info("tcp")
 		listener, listenError = net.Listen("tcp", fmt.Sprintf("%s:%s", cfg.Listen.BindIP, cfg.Listen.Port))
 		logger.Infof("server is listening port %s:%s", cfg.Listen.BindIP, cfg.Listen.Port)
-
 	}
 
 	if listenError != nil {

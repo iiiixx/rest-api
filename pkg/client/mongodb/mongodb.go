@@ -38,12 +38,11 @@ func NewClient(ctx context.Context, host, port, username, password, database, au
 
 	}
 
+	//Ping
 	if err = client.Ping(ctx, nil); err != nil {
 		return nil, fmt.Errorf("failed to ping to mongoDB due to error: %v", err)
 
 	}
-
-	//Ping
 
 	return client.Database(database), nil
 }
