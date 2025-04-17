@@ -1,12 +1,18 @@
-# rest-api-tutorial
+# REST API Server
 
-# user-service
+Простой REST API сервер для управления пользователями с базой данных MongoDB. Реализованы основные CRUD операции.
 
-# REST API
+Особенности:
+- Создание, чтение, обновление и удаление пользователей
+- Настройка через конфигурационный файл (YAML)
+- Поддержка двух типов подключения: TCP-порт или Unix-сокет
+- Логирование операций
+- Обработка ошибок с middleware
+- Интеграция с MongoDB
 
-GET /users -- list of users -- 200, 404, 500
-GET /users/:id -- user by id -- 200, 404, 500
-POST /users/:id -- create user -- 204, 4xx, Header Location: url
-PUT /users/:id -- fully update user 204/200, 404, 400, 500
-PATCH /users/:id -- partially update user -- 204/200, 404, 400, 500
-DELETE /users/:id -- delete user by id -- 204, 404, 400
+Технологии:
+- Golang
+- HTTP Router: [julienschmidt/httprouter](https://github.com/julienschmidt/httprouter)
+- Конфигурация: [cleanenv](https://github.com/ilyakaznacheev/cleanenv)
+- MongoDB Driver: [official mongo-driver](https://go.mongodb.org/mongo-driver)
+- Логирование:[logrus](https://github.com/sirupsen/logrus)
